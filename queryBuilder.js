@@ -38,15 +38,47 @@ function insertQueryMaker(jsonObj){
 	}
 }
 
+function updateQueryMaker(jsonObj){
+	if(jsonObj.hasOwnProperty("table")){
+		var setData = jsonObj.set;
+		var fieldUpdateStr = "";
+		var conditionStr = "";
+		for(var field in setData){
+			
+			if(typeof(setData[field]) === "number"){
+				fieldUpdateStr += field + "=" + setData[field]+",";
+			}else if(typeof(setData[field]) === "string"){
+				fieldUpdateStr += field + "=" + "\'" + setData[field]+"\',";
+			}
+		}
+
+		fieldUpdateStr = fieldUpdateStr.slice(0,fieldUpdateStr.length-1);
+		var finalStr = "UPDATE " + jsonObj.table + " SET " + fieldUpdateStr;
+		if(jsonObj.where){
+			conditionStr = " where ";
+			for(condition in jsonObj.where){
+
+			}
+		}
+
+		finalStr += conditionStr;
+		console.log(finalStr);
+	}
+};
+
 var jsonObj = {
 	table:"emp",
-	data:{
+	set:{
 		id:10,
 		name:"xyz",
 		salary:100000.0,
 		dept:"computer",
-	}
-}
+	},
+	where:{
 
-insertQueryMaker(jsonObj);
+	}
+};
+
+updateQueryMaker(jsonObj);
+
 	
