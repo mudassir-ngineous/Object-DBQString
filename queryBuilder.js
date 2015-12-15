@@ -5,25 +5,18 @@ var parseJsonForInsert = function(){
 function insertQueryMaker(jsonObj){
 	if(jsonObj.hasOwnProperty("table")){
 		var data = jsonObj.data;
+		var fieldNameList = [];
+		var fieldValueList = [];
 		var fieldNameStr = "(";
 		var fieldValueStr = "(";
 		for(var field in data){
-			fieldNameStr+=field+",";
-			fieldValueStr += getFormattedString(data[field]) + ","
+			fieldNameList.push(field);
+			fieldValueList.push(getFormattedString(data[field]));
 		}
 
-		if(fieldNameStr[fieldNameStr.length-1] === ","){
-			fieldNameStr[fieldNameStr.length-1] = '';
-		}
 
-		if(fieldValueStr[fieldValueStr.length-1] === ","){
-			fieldValueStr[fieldValueStr.length-1] = '';
-		}
-
-		fieldNameStr = fieldNameStr.slice(0,fieldNameStr.length-1);
-		fieldValueStr = fieldValueStr.slice(0,fieldValueStr.length-1);
-		fieldNameStr+=")";
-		fieldValueStr+=")";
+		fieldNameStr += fieldNameList.join(",") + ")";
+		fieldValueStr += fieldValueList.join(",") + ")";
 
 		var finalStr = "INSERT INTO "+ jsonObj.table + " " + fieldNameStr + " VALUES " + fieldValueStr + ";";
 		console.log(finalStr);
@@ -46,33 +39,71 @@ function updateQueryMaker(jsonObj){
 		fieldUpdateStr = fieldUpdateStr.slice(0,fieldUpdateStr.length-1);
 		var finalStr = "UPDATE " + jsonObj.table + " SET " + fieldUpdateStr;
 		if(jsonObj.where){
-			conditionStr += " WHERE "+processConditionObj(jsonObj.where,"AND");
+			conditionStr += " WHERE "+ processConditionObj(jsonObj.where,"AND");
 			if(conditionStr === " WHERE "){
 				conditionStr="";
 			}
 		}
 
 		finalStr += conditionStr;
-		console.log(finalStr);
+		return finalStr;
+	}else{
+		return null;
 	}
 }
 
+function deleteQueryMaker(jsonObj){
+	if(jsonObj.hasOwnProperty("table")){
+		var setData = jsonObj.set;
+		var fieldUpdateStr = "";
+		var conditionStr = "";
 
-function conditionParser(condObj,operator){
-	var conditionString = "";
-	var conditions = [];
-
-	for(var field in condObj){
-		var temp = field + "=" + getFormattedString(condObj[field]);
-		if(field === "$or"){
-			conditionParser(condObj[field],field);
+		var finalStr = "DELETE FROM " + jsonObj.table;
+		if(jsonObj.where){
+			conditionStr += " WHERE "+ processConditionObj(jsonObj.where,"AND");
+			if(conditionStr === " WHERE "){
+				conditionStr="";
+			}
 		}
-		conditions.push(temp);
-	}
-	console.log(conditions);
 
-	return conditionString;
+		finalStr += conditionStr;
+		return finalStr;
+	}else{
+		return null;
+	}
 }
+
+function selectQueryMaker(jsonObj){
+	if(jsonObj.hasOwnProperty("table") && jsonObj.hasOwnProperty("columns")){
+		var finalStr="";
+		var fieldStr="";
+		var conditionStr="";
+
+		if(jsonObj.columns.indexOf("*")>-1){
+			fieldStr = "*"
+		}else{
+			fieldStr = jsonObj.columns.join(",");
+		}
+
+		if(jsonObj.where){
+			conditionStr += " WHERE "+ processConditionObj(jsonObj.where,"AND");
+			if(conditionStr === " WHERE "){
+				conditionStr="";
+			}
+		}
+
+		if(typeof(jsonObj.table) === 'object' && jsonObj.table.length>1){
+			finalStr = "SELECT " + fieldStr + " FROM " + jsonObj.table.join(",") + conditionStr;
+		}else{
+			finalStr = "SELECT " + fieldStr + " FROM " + jsonObj.table + conditionStr;
+		}
+		
+
+		return finalStr;
+	}else{
+		return null;
+	}
+};
 
 function getFormattedString(s){
 	if(typeof(s) === "number"){
@@ -125,26 +156,6 @@ function processConditionObj(cond_obj,operator){
 	}	
 };
 
-function greaterThanString(gtObj){
-
-}
-
-function lessThanString(ltObj){
-
-}
-
-function gteString(gteObj){
-
-}
-
-function lteString(lteObj){
-
-}
-
-function orString(orObj){
-
-}
-
 function getOperator(str){
 	switch(str){
 		case "$lt": return "<";
@@ -159,15 +170,13 @@ function getOperator(str){
 
 var jsonObj = {
 	table:"emp",
-	set:{
-		name:"xyz",
-		salary:100000.0,
-		dept:"computer",
-	},
+	columns:["id","name","salary"],
 	where:{
-		"$or":[{id:3},{name:"gopinath"}]
-	}
+		"$or":[{"id":3},{"name":"gopinath"}]
+	},
+	orderbBy:[("id","asc"),("name","desc")],
+	groupBy : ["id","name"],
+	limit:10
 };
 
-updateQueryMaker(jsonObj);
-
+a = selectQueryMaker(jsonObj);
