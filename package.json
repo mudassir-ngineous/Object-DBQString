@@ -1,26 +1,11 @@
 {
-  "name": "queryBuilder",
-  "version": "0.0.1",
-  "private": true,
+  "name": "jsonToQuery",
+  "version": "1.0.0",
+  "description": "translate OBJECTS syntactically defined by mongo into relational database queries",
+  "main": "queryBuilder.js",
   "scripts": {
-    "start": "queryBuilder.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "main": "api.js",
-  "engines": [
-    "node >= 0.11.13"
-  ],
-  "dependencies": {
-    "express": "*",
-    "mysql": "x",
-    "node-static": "x",
-    "node-uuid": "^1.4.3",
-    "pm2": "*",
-    "sleep": "*",
-    "winston": "^0.9.0",
-  },
-  "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-jshint": "^0.11.2",
-    "grunt-contrib-watch": "^0.6.1"
-  }
+  "author": "Mudassirkhan Pathan <mmpathan313@gmail.com> (https://github.com/mudassir-ngineous)",
+  "license": "ISC"
 }
