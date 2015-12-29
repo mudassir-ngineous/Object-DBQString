@@ -1,4 +1,4 @@
-var db = require("./queryBuilder.js").init("sqlite");
+var db = require("./queryBuilder.js")("sqlite");
 
 var jsonObj = {
 	table:"emp",
